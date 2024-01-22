@@ -22,7 +22,7 @@ request_params = CryptoBarsRequest(
                         end=end
                  )
 
-bars = client.get_crypto_bars(request_params=request_params, feed="us")
+bars = client.get_crypto_bars(request_params=request_params)
 
 # access bars as list - important to note that you must access by symbol key
 # even for a single symbol request - models are agnostic to number of symbols

@@ -9,6 +9,6 @@ client = CryptoHistoricalDataClient(apikey, secretkey)
 
 params = CryptoLatestQuoteRequest(symbol_or_symbols='BTC/USD')
 
-q = client.get_crypto_latest_quote(request_params=params, feed='us')['BTC/USD']
+q = client.get_crypto_latest_quote(request_params=params)['BTC/USD']
 
 print(f"{q.timestamp.strftime('%H:%M:%S')}\t{q.ask_price:.2f}")
