@@ -3,10 +3,10 @@ import multiprocessing
 import time
 import queue  # Import the queue module
 
-# sys.path.insert(0, './UI')
 
-from UI.widget_plots import main
-# import widget_plots as wp
+# from UI.widget_plots import main
+from UI.widget_info import labels_main
+
 
 def streaming_process(data_queue):
     # Placeholder for your streaming logic (e.g., using WebSocket)
@@ -15,7 +15,7 @@ def streaming_process(data_queue):
     # Example: Replace this with your streaming logic
     for data_item in range(5):
         time.sleep(1)  # Simulating streaming activity
-        data_queue.put(data_item)
+        data_queue.put("GOT" + str(data_item))
 
     print("Streaming process finished")
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
     data_queue = multiprocessing.Queue()
 
     # Create multiprocessing.Process objects for streaming and analysis
-    ui_process = multiprocessing.Process(target=main)
+    ui_process = multiprocessing.Process(target=labels_main, args=(data_queue,))
     streaming = multiprocessing.Process(target=streaming_process, args=(data_queue,))
     analysis = multiprocessing.Process(target=analysis_process, args=(data_queue,))
 

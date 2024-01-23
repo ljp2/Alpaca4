@@ -1,7 +1,8 @@
 import sys
+from multiprocessing import Queue
 
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel
-
+from PyQt6.QtCore import QTimer
 
 class Information(QWidget):
     def __init__(self):
@@ -18,8 +19,25 @@ class Information(QWidget):
         layout.addWidget(self.label_4)
         self.setLayout(layout)
 
-if __name__ == '__main__':
+
+def labels_main(queue: Queue):
     app = QApplication(sys.argv)
-    main = Information()
-    main.show()
+    labels = Information()
+
+    def check_queue():
+        while not queue.empty():
+            data = queue.get()
+            labels.label_1.setText(str(data))
+            
+    timer = QTimer()
+    timer.timeout.connect(check_queue)
+    timer.start(1)  # Adjust the interval as needed
+
+    labels.show()
     sys.exit(app.exec())
+    
+if __name__ == "__main__":
+    queue = Queue()
+    labels_main(queue)
+
+
