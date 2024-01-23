@@ -1,3 +1,7 @@
+import pandas as pd
+from datetime import datetime
+from time import sleep
+
 from alpaca.data.historical import CryptoHistoricalDataClient
 from alpaca.data.requests import CryptoLatestQuoteRequest
 
@@ -9,6 +13,10 @@ client = CryptoHistoricalDataClient(apikey, secretkey)
 
 params = CryptoLatestQuoteRequest(symbol_or_symbols='BTC/USD')
 
-q = client.get_crypto_latest_quote(request_params=params)['BTC/USD']
+q = client.get_crypto_latest_bar(request_params=params)['BTC/USD']
 
-print(f"{q.timestamp.strftime('%H:%M:%S')}\t{q.bid_price:.2f} / {q.ask_price:.2f} ")
+z = "{}  {}\t{:0.2f}   {:0.2f}   {:0.2f}   {:0.2f}".format(
+    datetime.utcnow().strftime('%H:%M:%S'),
+    q.timestamp.strftime('%H:%M:%S'),  q.open, q.high, q.low, q.close)     
+print(z)
+        

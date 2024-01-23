@@ -16,9 +16,17 @@ class TimeAxisItem(pg.DateAxisItem):
 class Plots(QWidget):
     def __init__(self, xlimits=None, ylimits=None):
         super().__init__()
-
+            
+        now = datetime.utcnow().timestamp()
+        start = now - 5
+        end = now + 180
+        xlow = start
+        xhigh = end
+        ylow = 41000
+        yhigh = 44000
 
         self.w = pg.GraphicsLayoutWidget()
+        self.w.setBackground('ivory')
 
         # Create three subplots
         self.p1 = self.w.addPlot(title="Plot 1")
@@ -48,22 +56,13 @@ class Plots(QWidget):
         layout.addWidget(self.w)
         self.setLayout(layout)
         
-        
+    
+def plots_main():
+    app = QApplication(sys.argv)
+    plots = Plots()
+    plots.show()
+    sys.exit(app.exec())    
         
     
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    
-    
-    now = datetime.utcnow().timestamp()
-    start = now - 5
-    end = now + 180
-    xlow = start
-    xhigh = end
-    ylow = 41000
-    yhigh = 44000
-    
-    main = Plots(xlimits=[xlow, xhigh], ylimits=[ylow, yhigh])
-    
-    main.show()
-    sys.exit(app.exec())
+    plots_main()
