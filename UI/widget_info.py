@@ -20,14 +20,16 @@ class Information(QWidget):
         self.setLayout(layout)
 
 
-def labels_main(queue: Queue):
+def labels_main(queues):
     app = QApplication(sys.argv)
     labels = Information()
+    
+    info_queue:Queue = queues["info"]
 
     def check_queue():
-        while not queue.empty():
-            data = queue.get()
-            labels.label_1.setText(str(data))
+        while not info_queue.empty():
+            bar = info_queue.get()
+            labels.label_1.setText(bar.timestamp.strftime("%M:%S"))
             
     timer = QTimer()
     timer.timeout.connect(check_queue)
@@ -36,8 +38,6 @@ def labels_main(queue: Queue):
     labels.show()
     sys.exit(app.exec())
     
-if __name__ == "__main__":
-    queue = Queue()
-    labels_main(queue)
-
-
+# if __name__ == "__main__":
+#     queue = Queue()
+#     labels_main(queue)
