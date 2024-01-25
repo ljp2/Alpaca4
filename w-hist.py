@@ -13,7 +13,7 @@ secretkey = paper_secretkey
 client = CryptoHistoricalDataClient(apikey, secretkey)
 
 end = datetime.utcnow()
-start = end - timedelta(minutes=5)
+start = end - timedelta(hours=1)
 
 request_params = CryptoBarsRequest(
                         symbol_or_symbols=["BTC/USD"],
@@ -22,10 +22,8 @@ request_params = CryptoBarsRequest(
                         end=end
                  )
 
-bars = client.get_crypto_bars(request_params=request_params)
+data = client.get_crypto_bars(request_params=request_params)
 
-# access bars as list - important to note that you must access by symbol key
-# even for a single symbol request - models are agnostic to number of symbols
-b = bars["BTC/USD"]
-
-print(b[0].close)
+bars = data["BTC/USD"]  
+for b in bars:
+       print(b)
