@@ -44,6 +44,7 @@ except Exception as e:
         print(f'Exception from websocket connection: {e}')
 finally:
     print("Trying to re-establish connection")
+    crypto_stream.unsubscribe_bars("BTC/USD")
     sleep(3)
     crypto_stream.subscribe_bars(bar_data_handler, "BTC/USD")
     crypto_stream.run()
