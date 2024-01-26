@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 import alpaca.data.models as alpaca_models
 
+
 def calculate_heiken_ashi(df):
     ha_df = pd.DataFrame(index=df.index, columns=['open', 'high', 'low', 'close'])
     for i in range(len(df)):
@@ -24,8 +25,9 @@ class Bar:
         self.close:float = close
 
     def __str__(self):
-        return f'{self.open:.2f} {self.high:.2f} {self.low:.2f} {self.close:.2f}'
-    
+        z =f'{self.timestamp.strftime("%H%M%S")} {self.open:.2f} {self.high:.2f} {self.low:.2f} {self.close:.2f}'
+        return z
+
 class Bars:
     def __init__(self, df:pd.DataFrame):
         if df is None:
@@ -33,8 +35,7 @@ class Bars:
             self.df = pd.DataFrame(columns=['timestamp', 'open', 'high', 'low', 'close'])
         else:
             df['timestamp'] = pd.to_datetime(df['timestamp'])
-            df.set_index('timestamp', inplace=True)
-            self.df = df[['open', 'high', 'low', 'close']].copy()
+            self.df = df[open', 'high', 'low', 'close']].copy()
             self.last_timestamp = df.index[-1]
             
     def add(self, bar:alpaca_models.bars.Bar):
@@ -48,6 +49,5 @@ class Bars:
                 self.df.loc[bar.timestamp, 'close'] = bar.close
             else:
                 self.last_timestamp = bar.timestamp
-        self.df.loc[bar.timestamp] = [bar.open, bar.high, bar.low, bar.close]
-    
-    
+                
+                
