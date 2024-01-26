@@ -1,4 +1,6 @@
 from alpaca.data.live import CryptoDataStream
+from alpaca.data.historical import CryptoHistoricalDataClient
+
 import alpaca.data.models as models
 from alpaca.data.historical import CryptoHistoricalDataClient
 from alpaca.data.requests import CryptoLatestQuoteRequest
