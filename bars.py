@@ -52,3 +52,13 @@ class Bars(pd.DataFrame):
             self.loc[len(self)] = row
         else:
             raise ValueError("Row must be a pandas Series or a dictionary.")
+ 
+class Bar(pd.Series):
+    def __init__(self, bar:alpaca_models.Bar):
+        super().__init__(*args, **kwargs)
+        self.timestamp = bar.timestamp
+        self.open = bar.open
+        self.high = bar.high
+        self.low = bar.low
+        self.close = bar.close
+
