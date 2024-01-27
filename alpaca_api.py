@@ -119,14 +119,21 @@ def getLatestCryptoQuote(symbol):
     return latest_quote
 
 
-def getHistoricalCryptoBars(symbol, timeframe, start, end) -> pd.DataFrame:
+def getHistoricalCryptoBars(symbol, start, end, timeframe=TimeFrame.Minute) -> pd.DataFrame:
     client = CryptoHistoricalDataClient(apikey, secretkey)
     request_params = CryptoBarsRequest(
         symbol_or_symbols=symbol, timeframe=timeframe, start=start, end=end
     )
     historical_data = client.get_crypto_bars(request_params)
-    df = historical_data.df.loc[symbol]
-    df.columns = [s.capitalize() for s in df.columns]
-    sdf = df[["Open", "High", "Low", "Close"]]
-    return sdf
+    # df = historical_data.df.loc[symbol]
+    # df.columns = [s.capitalize() for s in df.columns]
+    # sdf = df[["Open", "High", "Low", "Close"]]
+    # return sdf
+    return historical_data.data[symbol]
 
+if __name__ == "__main__":
+    symbol = "BTC/USD"
+    end = datetime.now()
+    start = end - timedelta(hours=1)
+    bars = getHistoricalCryptoBars(symbol, start, end)
+    pass
