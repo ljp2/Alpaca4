@@ -1,6 +1,21 @@
 import pandas as pd
+import numpy as np
 from datetime import datetime, timedelta
 import alpaca.data.models as alpaca_models
+from math import sqrt
+
+def hull_moving_average_last(values, period):
+    if len(values) < period:
+        return np.nan
+    def wma(values, n):
+        return sum((n - i) * values[-(n - i)] for i in range(n)) / ((n * (n + 1)) / 2)
+    wma_short = 2 * wma(values, int(period / 2))
+    wma_long = wma(values, period)
+    diff = wma_short - wma_long
+    hma_period = int(sqrt(period))
+    hma = wma(values, hma_period)
+    hma += diff
+    return hma
 
 class HAbars(pd.DataFrame):
     @property
@@ -33,32 +48,21 @@ class HAbars(pd.DataFrame):
         self.bars = self.bars.append({'timestamp': new_bar['timestamp'], 'open': ha_open, 'high': ha_high, 'low': ha_low, 'close': ha_close}, ignore_index=True)
 
 class Bars(pd.DataFrame):
-    _metadata = ['timestamp', 'open', 'high', 'low', 'close']
+    _tohlc_cols = ['timestamp', 'open', 'high', 'low', 'close']
+    _ma_cols = ['maopen', 'mahigh', 'malow', 'maclose']
+    _all_cols = _tohlc_cols + _ma_cols
+    
+    def __init__(self):
+        data = pd.DataFrame(columns=self._all_cols)
+        super().__init__(data)
 
-    def __init__(self, data=None, **kwargs):
-        if data is None:
-            data = pd.DataFrame(columns=self._metadata)
-        elif isinstance(data, dict):
-            data = pd.DataFrame(data, columns=self._metadata)
-        super().__init__(data, **kwargs)
-
-    @property
-    def _constructor(self):
-        return Bars
-
-    def add_row(self, row):
-        if isinstance(row, (pd.Series, dict)):
-            row = {key: row[key] for key in self._metadata if key in row}
-            self.loc[len(self)] = row
-        else:
-            raise ValueError("Row must be a pandas Series or a dictionary.")
- 
-class Bar(pd.Series):
-    def __init__(self, bar:alpaca_models.Bar):
-        super().__init__(*args, **kwargs)
-        self.timestamp = bar.timestamp
-        self.open = bar.open
-        self.high = bar.high
-        self.low = bar.low
-        self.close = bar.close
-
+    def add_row(self, tohlc, maperiods):
+        row = {key: tohlc[key] for key in self._tohlc_cols}
+        for key in self._ma_cols:
+            period = maperiods[key]
+            values = self[key].values
+            if len(values) < period:
+                row[key] = np.nan
+            else:
+                row[key] = hull_moving_average_last(self[key].values, period)
+        self.loc[len(self)] = row
