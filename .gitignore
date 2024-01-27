@@ -22,3 +22,5 @@ env3/
 *.DS_Store
 *.bak
 *.swp
+
+*.txt
