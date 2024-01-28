@@ -67,20 +67,22 @@ class Bars(pd.DataFrame):
                 row[self._ma_cols[i]] = hull_moving_average_last(self[key].values, period)
         self.loc[len(self)] = row
 
-symbol = "BTC/USD"
-end = datetime.now()
-start = end - timedelta(hours=4)
-bars = getHistoricalCryptoBars(symbol, start, end)
-b = Bars()
 
-for x in bars:
-    st = x.timestamp.strftime('%H:%M:%S')
-    sohlc = f'{x.open:.2f} {x.high:.2f} {x.low:.2f} {x.close:.2f}'
-    # print(f'{st} {sohlc}')
-    b.add_row(x, {'open': 9, 'high': 5, 'low': 5, 'close': 9})
+if __name__ == '__main__':
+    symbol = "BTC/USD"
+    end = datetime.now()
+    start = end - timedelta(hours=4)
+    bars = getHistoricalCryptoBars(symbol, start, end)
+    b = Bars()
+
+    for x in bars:
+        st = x.timestamp.strftime('%H:%M:%S')
+        sohlc = f'{x.open:.2f} {x.high:.2f} {x.low:.2f} {x.close:.2f}'
+        # print(f'{st} {sohlc}')
+        b.add_row(x, {'open': 9, 'high': 5, 'low': 5, 'close': 9})
 
 
-# b[['maopen', 'mahigh', 'malow', 'maclose']].plot()
-b[['mahigh', 'malow']].plot()
-plt.show()
-    
+    # b[['maopen', 'mahigh', 'malow', 'maclose']].plot()
+    b[['mahigh', 'malow']].plot()
+    plt.show()
+        
