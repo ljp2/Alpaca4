@@ -6,7 +6,7 @@ from math import sqrt
 from alpaca_api import getHistoricalCryptoBars
 import matplotlib.pyplot as plt
 
-import numpy as np
+import params
 
 def dema_last(series, period):
     # Convert the series to a pandas Series if it's not already
@@ -46,32 +46,33 @@ def hull_moving_average_last(values, period):
     hma += diff
     return hma
 
-class Bars(pd.DataFrame):
+class Bars():
     _tohlc_cols = ['timestamp', 'open', 'high', 'low', 'close']
     _ohlc_cols = ['open', 'high', 'low', 'close']
     _ma_cols = ['maopen', 'mahigh', 'malow', 'maclose']
     _all_cols = _tohlc_cols + _ma_cols
     
     def __init__(self):
-        data = pd.DataFrame(columns=self._all_cols)
-        super().__init__(data)
+        self.periods = params.ma_periods
+        self.bars = pd.DataFrame(columns=self._all_cols)
 
-    def add_row(self, tohlc, periods):
+    def add_bar(self, tohlc):
         row = {attr:getattr(tohlc, attr) for attr in self._tohlc_cols}
         for i,key in enumerate(self._ohlc_cols):
-            period = periods[key]
-            values = self[key].values
+            period = self.periods[key]
+            values = self.bars[key].values
             if len(values) < period:
                 row[self._ma_cols[i]] = np.nan
             else:
-                row[self._ma_cols[i]] = hull_moving_average_last(self[key].values, period)
-        self.loc[len(self)] = row
+                row[self._ma_cols[i]] = hull_moving_average_last(values, period)
+        self.bars.loc[len(self.bars)] = row
 
-
+    
+    
 if __name__ == '__main__':
     symbol = "BTC/USD"
     end = datetime.now()
-    start = end - timedelta(hours=4)
+    start = end - timedelta(hours=1)
     bars = getHistoricalCryptoBars(symbol, start, end)
     b = Bars()
 
@@ -79,10 +80,10 @@ if __name__ == '__main__':
         st = x.timestamp.strftime('%H:%M:%S')
         sohlc = f'{x.open:.2f} {x.high:.2f} {x.low:.2f} {x.close:.2f}'
         # print(f'{st} {sohlc}')
-        b.add_row(x, {'open': 9, 'high': 5, 'low': 5, 'close': 9})
+        b.add_bar(x, {'open': 9, 'high': 5, 'low': 5, 'close': 9})
 
 
     # b[['maopen', 'mahigh', 'malow', 'maclose']].plot()
-    b[['mahigh', 'malow']].plot()
+    b.bars[['mahigh', 'malow']].plot()
     plt.show()
         
