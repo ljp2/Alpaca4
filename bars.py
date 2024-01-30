@@ -46,44 +46,54 @@ def hull_moving_average_last(values, period):
     hma += diff
     return hma
 
-class Bars():
+
+
+def bars_process(queues):
+
+    symbol = "BTC/USD"
     _tohlc_cols = ['timestamp', 'open', 'high', 'low', 'close']
     _ohlc_cols = ['open', 'high', 'low', 'close']
     _ma_cols = ['maopen', 'mahigh', 'malow', 'maclose']
     _all_cols = _tohlc_cols + _ma_cols
-    
-    def __init__(self):
-        self.periods = params.ma_periods
-        self.bars = pd.DataFrame(columns=self._all_cols)
+    periods = {'open': 9, 'high': 5, 'low': 9, 'close': 5}
 
-    def add_bar(self, tohlc):
-        row = {attr:getattr(tohlc, attr) for attr in self._tohlc_cols}
-        for i,key in enumerate(self._ohlc_cols):
-            period = self.periods[key]
-            values = self.bars[key].values
+    bars = pd.DataFrame(columns=_all_cols)
+
+    def add_row_bars(data_bar):
+        row = {attr:getattr(data_bar, attr) for attr in _tohlc_cols}
+        for i,key in enumerate(_ohlc_cols):
+            period = periods[key]
+            values = bars[key].values
             if len(values) < period:
-                row[self._ma_cols[i]] = np.nan
+                row[_ma_cols[i]] = np.nan
             else:
-                row[self._ma_cols[i]] = hull_moving_average_last(values, period)
-        self.bars.loc[len(self.bars)] = row
+                row[_ma_cols[i]] = hull_moving_average_last(values, period)
+        bars.loc[len(bars)] = row
 
-    
+    def init_bars():
+        end = datetime.now()
+        start = end - timedelta(hours=1)
+        data = getHistoricalCryptoBars(symbol, start, end)
+        for x in data:
+            add_row_bars(x)
+
+
+    init_bars()
+    queues['init_bars'].put(bars)
+
     
 if __name__ == '__main__':
-    symbol = "BTC/USD"
-    end = datetime.now()
-    start = end - timedelta(hours=1)
-    bars = getHistoricalCryptoBars(symbol, start, end)
-    b = Bars()
+    bars_process(None)
 
-    for x in bars:
-        st = x.timestamp.strftime('%H:%M:%S')
-        sohlc = f'{x.open:.2f} {x.high:.2f} {x.low:.2f} {x.close:.2f}'
-        # print(f'{st} {sohlc}')
-        b.add_bar(x, {'open': 9, 'high': 5, 'low': 5, 'close': 9})
+
+    # for x in bars:
+    #     st = x.timestamp.strftime('%H:%M:%S')
+    #     sohlc = f'{x.open:.2f} {x.high:.2f} {x.low:.2f} {x.close:.2f}'
+    #     # print(f'{st} {sohlc}')
+    #     b.add_bar(x, {'open': 9, 'high': 5, 'low': 5, 'close': 9})
 
 
     # b[['maopen', 'mahigh', 'malow', 'maclose']].plot()
-    b.bars[['mahigh', 'malow']].plot()
-    plt.show()
+    # b.bars[['mahigh', 'malow']].plot()
+    # plt.show()
         
