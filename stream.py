@@ -1,4 +1,5 @@
-import multiprocessing
+from multiprocessing import Process, Queue
+
 import pandas as pd
 from datetime import datetime, timedelta
 from time import sleep
@@ -13,9 +14,9 @@ ALPACA_SECRET_KEY = paper_secretkey
 client = CryptoHistoricalDataClient(ALPACA_API_KEY, ALPACA_SECRET_KEY)
 request=CryptoLatestBarRequest(symbol_or_symbols='BTC/USD')
 
-def get_bars_process(queues):
-    bars_queue:multiprocessing.Queue = queues["bars"]
-    info_queue:multiprocessing.Queue = queues["info"]
+def stream_bars_process(queues):
+    bars_queue:Queue = queues["bars"]
+    info_queue:Queue = queues["info"]
     client = CryptoHistoricalDataClient(ALPACA_API_KEY, ALPACA_SECRET_KEY)
     request=CryptoLatestBarRequest(symbol_or_symbols='BTC/USD')
     while True:
@@ -29,4 +30,3 @@ def get_bars_process(queues):
         except Exception as e:
             print(e)
             sleep(3)
-    
