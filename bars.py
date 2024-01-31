@@ -33,20 +33,6 @@ def weighted_moving_average_last(values, period):
     weighted_values = values[-period:]
     return sum(w*v for w, v in zip(weights, weighted_values)) / sum(weights)
 
-def hull_moving_average_last(values, period):
-    if len(values) < period:
-        return np.nan
-    def wma(values, n):
-        return sum((n - i) * values[-(n - i)] for i in range(n)) / ((n * (n + 1)) / 2)
-    wma_short = 2 * wma(values, int(period / 2))
-    wma_long = wma(values, period)
-    diff = wma_short - wma_long
-    hma_period = int(sqrt(period))
-    hma = wma(values, hma_period)
-    hma += diff
-    return hma
-
-
 
 def bars_process(queues):
 
@@ -67,7 +53,7 @@ def bars_process(queues):
             if len(values) < period:
                 row[_ma_cols[i]] = np.nan
             else:
-                row[_ma_cols[i]] = hull_moving_average_last(values, period)
+                row[_ma_cols[i]] = weighted_moving_average_last(values, period)
         bars.loc[len(bars)] = row
 
     def init_bars():
