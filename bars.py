@@ -71,15 +71,9 @@ def bars_process(queues):
         data = getHistoricalCryptoBars(symbol, start, end)
         for x in data:
             add_row_bars(x)
-        # bars['timestamp'] = bars['timestamp'].astype('int64') // 10**9
-            
-    # def get_next_bar():
-    #     d = client.get_crypto_latest_bar(request_params=request)['BTC/USD']
-    #     return (int(d.timestamp.timestamp()), d.open, d.high, d.low, d.close)
+
 
     init_bars()
-
-
     # queues['init_bars'].put(bars)
     print(bars.tail(2))
     
@@ -92,7 +86,6 @@ def bars_process(queues):
             i += 1
             bar = client.get_crypto_latest_bar(request_params=request)['BTC/USD']
             if bar.timestamp.timestamp() == last_timestamp:
-                # print('same timestamp', bar)
                 sleep(5)
                 continue
             else:
