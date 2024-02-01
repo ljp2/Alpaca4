@@ -9,36 +9,14 @@ from alpaca_api import getHistoricalCryptoBars
 from alpaca.data.historical.crypto import CryptoHistoricalDataClient
 from alpaca.data.requests import CryptoLatestBarRequest
 
+from moving_averages import weighted_moving_average_last
+
 from keys import paper_apikey, paper_secretkey
 ALPACA_API_KEY = paper_apikey
 ALPACA_SECRET_KEY = paper_secretkey
 
 import matplotlib.pyplot as plt
 
-def dema_last(series, period):
-    # Convert the series to a pandas Series if it's not already
-    series = pd.Series(series)
-    # Calculate the first EMA
-    ema1 = series.ewm(span=period, adjust=False).mean()
-    # Calculate the second EMA
-    ema2 = ema1.ewm(span=period, adjust=False).mean()
-    # Calculate the DEMA
-    dema = 2 * ema1 - ema2
-    # Return the last value
-    return dema.iloc[-1]
-
-def simple_moving_average_last(values, period):
-    if len(values) < period:
-        return np.nan
-    else:
-        return sum(values[-period:]) / period
-    
-def weighted_moving_average_last(values, period):
-    if len(values) < period:
-        return None
-    weights = list(range(1, period + 1))
-    weighted_values = values[-period:]
-    return sum(w*v for w, v in zip(weights, weighted_values)) / sum(weights)
 
 
 def bars_process(queues):
@@ -53,7 +31,7 @@ def bars_process(queues):
 
     bars = pd.DataFrame(columns=_all_cols)
 
-    def add_row_bars(data_bar):
+    def add_row_to_bars(data_bar):
         row = {attr:getattr(data_bar, attr) for attr in _tohlc_cols}
         row['timestamp'] = row['timestamp'].timestamp()
         for i,key in enumerate(_ohlc_cols):
@@ -70,7 +48,7 @@ def bars_process(queues):
         start = end - timedelta(hours=1)
         data = getHistoricalCryptoBars(symbol, start, end)
         for x in data:
-            add_row_bars(x)
+            add_row_to_bars(x)
 
 
     init_bars()
@@ -92,7 +70,7 @@ def bars_process(queues):
                 print()
                 i = 1
                 print('adding bar', bar)
-                add_row_bars(bar)
+                add_row_to_bars(bar)
                 last_timestamp = bar.timestamp.timestamp()
                 print(bars.tail(2))
                 # sleep(50)
