@@ -18,6 +18,8 @@ ALPACA_SECRET_KEY = paper_secretkey
 
 
 def bars_process(queues):
+    print("bars_process started", flush=True)
+    
     client = CryptoHistoricalDataClient(ALPACA_API_KEY, ALPACA_SECRET_KEY)
     request = CryptoLatestBarRequest(symbol_or_symbols="BTC/USD")
 
