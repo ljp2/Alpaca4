@@ -17,40 +17,29 @@ import time
 #            sys.exit(1)
            
            
+def plot_process(queues):
+    q = queues['plot']
+    plt.ion()
+    fig, ax = plt.subplots()
+    line, = ax.plot([], [], lw=2)
 
-# Create a queue
-q = Queue()
 
-# Function to put data into the queue
-def put_data_into_queue(q):
-    for i in range(100):
-        q.put(np.random.rand(10))
-        time.sleep(0.1)
+    data = q.get()
+    bars = data[1]
+    print('plot_process init', flush=True)
+    print(bars.tail(), flush=True)
+    
+    x = bars.timestamp.values
+    y = bars.close.values      
+    line.set_data(x, y)
+    plt.pause(0.1)
 
-# Create a new process that will put data into the queue
-p = Process(target=put_data_into_queue, args=(q,))
-p.start()
 
-# Create a figure and an axis
-fig, ax = plt.subplots()
-
-# Initialize a line object which will be updated
-line, = ax.plot([], [], lw=2)
-
-# Initialization function
-def init():
-    line.set_data([], [])
-    return line,
-
-# Animation function. This is called sequentially
-def animate(i):
-    if not q.empty():
-        y = q.get()
-        x = np.arange(len(y))
+    while True:
+        data = q.get()
+        bars = data[1]
+        x = bars.timestamp.values
+        y = bars.close.values
         line.set_data(x, y)
-    return line,
+        plt.pause(0.1)
 
-# Call the animator
-ani = animation.FuncAnimation(fig, animate, init_func=init, frames=100, interval=100, blit=True)
-
-plt.show()

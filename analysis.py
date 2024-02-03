@@ -57,8 +57,9 @@ def analysis_init(queues):
         for bar in bars_init:
             add_row_to_bars(bar)
             update_barsN()
-        queues['plot'].put(('init', bars))
-        
+        # queues['plot'].put(('init', bars))
+        print(bars.tail(2), flush=True)
+
     else:
         print('unknown resonse. should be init', res[0], flush=True)
         sys.exit(1)
@@ -70,7 +71,8 @@ def analysis_process(queues):
     print("analysis_process started", flush=True)
     analysis_init(queues)
     
-        
+    print("INIT DONE", flush=True)    
+    
     # print()  
     # print(bars.tail(), flush=True)
     # for i in range(grouping_N):
@@ -84,7 +86,8 @@ def analysis_process(queues):
             bar = res[1]
             add_row_to_bars(bar)
             update_barsN()
-            queues['analysis'].put((bar, bars, bars_n))
+            # queues['analysis'].put((bar, bars, bars_n))
+            print(bars.tail(2), flush=True)
         else:
             print('unknown resonse. should be bar', res[0])
             sys.exit(1)

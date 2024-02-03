@@ -18,7 +18,7 @@ def main():
 
     try:
         plot_data_process = Process(target=plot_process, args=(queues,), daemon=True)
-        plot_data_process.start()
+        # plot_data_process.start()
         do_analysis_process = Process(target=analysis_process, args=(queues,), daemon=True) 
         do_analysis_process.start()
         get_bars_process = Process(target=bars_process, args=(queues,), daemon=True)  
@@ -31,6 +31,7 @@ def main():
         # Handle Ctrl+C gracefully by terminating processes
         get_bars_process.terminate()
         do_analysis_process.terminate()
+        # plot_data_process.terminate()
         sys.exit(0)
 
 if __name__ == "__main__":
