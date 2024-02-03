@@ -7,15 +7,18 @@ from moving_averages import weighted_moving_average_last
 
 from bars import bars_process
 from analysis import analysis_process
+from plot import plot_process
 
 def main():
     queues = {
         "bars": Queue(),
         "plot": Queue(),
-        "info": Queue(),    
+        "analysis": Queue(),    
     }
 
     try:
+        plot_data_process = Process(target=plot_process, args=(queues,), daemon=True)
+        plot_data_process.start()
         do_analysis_process = Process(target=analysis_process, args=(queues,), daemon=True) 
         do_analysis_process.start()
         get_bars_process = Process(target=bars_process, args=(queues,), daemon=True)  

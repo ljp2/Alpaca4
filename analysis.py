@@ -49,10 +49,7 @@ def update_barsN():
     tf = bars_n[n]
     tf.loc[index] = row
 
-
-def analysis_process(queues):
-    print("analysis_process started", flush=True)
-    
+def analysis_init(queues):
     # wait for initial historical bars to initialize the bars dataframe
     res = queues['bars'].get()
     if res[0] == 'init':
@@ -60,17 +57,26 @@ def analysis_process(queues):
         for bar in bars_init:
             add_row_to_bars(bar)
             update_barsN()
+        queues['plot'].put(('init', bars))
+        
     else:
         print('unknown resonse. should be init', res[0], flush=True)
         sys.exit(1)
+
+    
+    
+    
+def analysis_process(queues):
+    print("analysis_process started", flush=True)
+    analysis_init(queues)
+    
         
-    print()  
-    print(bars.tail(), flush=True)
-        
-    for i in range(grouping_N):
-        print('bars_n', i)
-        print(bars_n[i].tail())
-        print()
+    # print()  
+    # print(bars.tail(), flush=True)
+    # for i in range(grouping_N):
+    #     print('bars_n', i)
+    #     print(bars_n[i].tail())
+    #     print()
         
     while True:
         res = queues['bars'].get()
